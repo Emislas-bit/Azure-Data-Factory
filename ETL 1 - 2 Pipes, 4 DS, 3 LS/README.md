@@ -12,12 +12,12 @@ El proyecto consiste en:
 </p>
 <ul align='left'>
   <li><b>Carga de un archivo Excel desde un entorno local</b> a una tabla en la primera base de datos SQL.</li>
-  <li><b>Transformación y transferencia de datos</b> desde la primera base de datos SQL hacia una tabla en la segunda base de datos SQL.</li>
-  <li><b>Automatización del flujo ETL</b> utilizando Azure Data Factory y recursos de integración.</li>
+  <li><b>Transferencia de datos</b> desde la primera base de datos SQL hacia una tabla en la segunda base de datos SQL.</li>
+  <li><b>Ejecución (manual) de los flujos ETL</b> utilizando Azure Data Factory y recursos de integración.</li>
 </ul>
 
 <p align='left'>
-El objetivo principal es demostrar las capacidades de Azure Data Factory para integrar datos locales y en la nube mediante procesos automatizados, seguros y eficientes.
+El objetivo principal es demostrar las capacidades de Azure Data Factory para integrar datos locales y en la nube mediante procesos  seguros y eficientes.
 </p>
 
 ---
@@ -74,7 +74,16 @@ ALTER ROLE db_owner ADD MEMBER [EmiDatafactoryTEST];
 
 <h4 align='left'>2. Configurar Azure Data Factory:</h4><ul align='left'>
 
-<li><b>2.1 Crear Linked Services:</b>
+<ul><li><b>2.1 Crear Integration Runtime (SHIR):</b>
+
+Azure Data Factory requiere un Self-hosted Integration Runtime (SHIR) para conectarse a recursos locales, como archivos en tu PC. Para configurarlo:
+
+<li><b>Instalar el Integration Runtime:</b> 
+<br>Descarga el SHIR desde el portal de Azure en la sección de Data Factory. Una vez descargado, instálalo en la máquina donde se encuentra el archivo Excel.</li>
+
+<li><b>Configurar y registrar el SHIR:</b> Durante la instalación, se te pedirá un token que puedes generar en el portal de Azure al crear el recurso de Integration Runtime. Copia y pega este token para registrar tu SHIR correctamente.</li>
+
+<br><li><b>2.1 Crear Linked Services:</b>
 
 Configura los servicios vinculados para conectarte al archivo Excel, la Base 1 y la Base 2.</li>
 <br>
@@ -124,4 +133,4 @@ Aquí es importante que tengas bien configurados los accesos a tu pc, con integr
 
 <h3 align='left'>Licencia:</h3> <p align='left'> Este proyecto está licenciado bajo la <b>MIT License</b>. Puedes usarlo y modificarlo libremente, siempre y cuando menciones al autor. </p>
 
-<h3 align='left'>Autor:</h3> <p align='left'> Creado por: <b>Emiliano Islas</b> </p> <p align='left'> - <a href="https://www.linkedin.com/in/e-islasrivero/">LinkedIn</a> <br> - <a href="https://github.com">GitHub</a> </p>
+<h3 align='left'>Autor:</h3> <p align='left'> Creado por: <b>Emiliano Islas</b> </p> <p align='left'> - <a href="https://www.linkedin.com/in/e-islasrivero/">LinkedIn</a> <br> - <a href="https://github.com/Emislas-bit">GitHub</a> </p>
