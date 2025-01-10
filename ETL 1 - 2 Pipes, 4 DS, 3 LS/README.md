@@ -1,35 +1,18 @@
-<h1 align='left'>Azure Data Factory ETL Project</h1>
+<h1 align='left'>Azure Data Factory: Proyecto ETL con Integración Local y en la Nube</h1>
 
 <p align='left'>
-Este es un proyecto desarrollado con <b>Azure Data Factory</b> que demuestra un flujo ETL completo, desde la carga de un archivo Excel local hasta la transferencia de datos entre dos bases de datos SQL en Azure. Este proyecto se centra en el uso de pipelines, datasets, linked services y un Self-hosted Integration Runtime (SHIR) para conectar recursos locales con la nube.
-</p>
-
----
-
-<h3 align='left'>Descripción del Proyecto:</h3>
-<p align='left'>
-El proyecto consiste en:  
-</p>
-<ul align='left'>
-  <li><b>Carga de un archivo Excel desde un entorno local</b> a una tabla en la primera base de datos SQL.</li>
-  <li><b>Transferencia de datos</b> desde la primera base de datos SQL hacia una tabla en la segunda base de datos SQL.</li>
-  <li><b>Ejecución (manual) de los flujos ETL</b> utilizando Azure Data Factory y recursos de integración.</li>
-</ul>
-
-<p align='left'>
-El objetivo principal es demostrar las capacidades de Azure Data Factory para integrar datos locales y en la nube mediante procesos  seguros y eficientes.
+Este proyecto utiliza Azure Data Factory para implementar un flujo ETL que conecta datos locales y en la nube. Incluye la carga de un archivo Excel local en una base de datos SQL, seguido de la transferencia de datos a una segunda base de datos SQL. Hace uso de pipelines, datasets, linked services y un Self-hosted Integration Runtime (SHIR) para conectar recursos locales con la nube.
 </p>
 
 ---
 
 <h3 align='left'>Requisitos Previos:</h3>
 <ul align='left'>
-  <li>Una cuenta de <b>Azure</b> activa.</li>
-  <li><b>Azure Data Factory</b> configurado.</li>
-  <li><b>Self-hosted Integration Runtime (SHIR)</b> instalado para acceder a recursos locales.</li>
-  <li>Dos bases de datos en <b>Azure SQL Database</b> con tablas vacías creadas.</li>
-  <li>Un archivo Excel local con datos (por ejemplo, <i>example.xlsx</i>).</li>
+  <li>Una cuenta activa de <b>Azure</b> con permisos para crear y configurar recursos (por ejemplo, bases de datos y Data Factory).</li>
+  <li>Un equipo local con capacidad para instalar el Self-hosted Integration Runtime (SHIR) y acceso al archivo Excel que se usará en el proyecto.</li>
 </ul>
+
+<h6>(Recordá eliminar los recursos al finalizar el proyecto para evitar gastos sopresa en tu cuenta)</h6>
 
 ---
 
@@ -38,7 +21,7 @@ El objetivo principal es demostrar las capacidades de Azure Data Factory para in
 <h4 align='left'>1. Configuración de las Bases de Datos SQL:</h4>
 <p align='left'>
 Crea dos bases de datos en Azure SQL.  
-En cada base, crea una tabla vacía para los datos:
+En cada base, crea una tabla vacía para los datos que hayas escogido, en mi caso solo usé dos columnas para algun tipo de alimento ficticio y su sabor:
 </p>
 
 ```sql
@@ -58,17 +41,17 @@ CREATE TABLE TablaBase2 (
 
 ```sql
 -- Crear un usuario para la identidad administrada de Azure Data Factory
-CREATE USER [EmiDatafactoryTEST] FROM EXTERNAL PROVIDER;
+CREATE USER [TuNombreDeDataFactory] FROM EXTERNAL PROVIDER;
 
 -- Otorgar permisos de propietario (db_owner) al usuario en la base de datos
-ALTER ROLE db_owner ADD MEMBER [EmiDatafactoryTEST];
+ALTER ROLE db_owner ADD MEMBER [TuNombreDeDataFactory];
 
 -- Si deseas otorgar permisos específicos de lectura y escritura en lugar de db_owner:
 -- Permisos de lectura
--- ALTER ROLE db_datareader ADD MEMBER [EmiDatafactoryTEST];
+-- ALTER ROLE db_datareader ADD MEMBER [TuNombreDeDataFactory];
 
 -- Permisos de escritura
--- ALTER ROLE db_datawriter ADD MEMBER [EmiDatafactoryTEST];
+-- ALTER ROLE db_datawriter ADD MEMBER [TuNombreDeDataFactory];
 ```
 
 
@@ -76,12 +59,12 @@ ALTER ROLE db_owner ADD MEMBER [EmiDatafactoryTEST];
 
 <ul><li><b>2.1 Crear Integration Runtime (SHIR):</b>
 
-Azure Data Factory requiere un Self-hosted Integration Runtime (SHIR) para conectarse a recursos locales, como archivos en tu PC. Para configurarlo:
+Azure Data Factory requiere un Self-hosted Integration Runtime (SHIR) para conectarse a recursos locales, como archivos en tu PC. <br> <br>Para configurarlo:
 
 <li><b>Instalar el Integration Runtime:</b> 
 <br>Descarga el SHIR desde el portal de Azure en la sección de Data Factory. Una vez descargado, instálalo en la máquina donde se encuentra el archivo Excel.</li>
-
-<li><b>Configurar y registrar el SHIR:</b> Durante la instalación, se te pedirá un token que puedes generar en el portal de Azure al crear el recurso de Integration Runtime. Copia y pega este token para registrar tu SHIR correctamente.</li>
+<br>
+<li><b>Configurar y registrar el SHIR:</b> Durante la instalación, te pedirá un token que se genera en el portal de Azure al crear el recurso de Integration Runtime. Copia y pega este token para registrar tu SHIR.</li>
 
 <br><li><b>2.1 Crear Linked Services:</b>
 
@@ -90,14 +73,15 @@ Configura los servicios vinculados para conectarte al archivo Excel, la Base 1 y
 ![image](https://github.com/user-attachments/assets/a57cba62-e03c-4e05-a38c-08417f79c6a7)
 
 
-<li><b>2.2 Crear Datasets:</b> Define datasets para el archivo Excel y las tablas SQL.</li> <br>
+<li><b>2.2 Crear Datasets:</b> Definí datasets para el archivo Excel y las tablas SQL.</li> <br>
 
 ![image](https://github.com/user-attachments/assets/aaa53aa7-dae2-4594-aaee-04bf12800024)
 
-<li><b>2.3 Crear Pipelines:</b> <ul> <li><b>Pipeline 1:</b> Carga los datos del archivo Excel a la tabla en la Base 1.</li>
+<li><b>2.3 Crear Pipelines:</b> <ul> <br><li><b>Pipeline 1:</b> Carga los datos del archivo Excel a la tabla en la Base 1.</li>
 <br>
-Debes imaginar el recorrido que harán tus datos, lugar 1 al lugar 2, y así mismo se configuran en la pipeline, desde un source
-u origen, a un destino o receptor. <br>
+Se hace mas llevadero, cuando imaginás el recorrido que harán tus datos, lugar 1 al lugar 2, y así mismo se configuran en la pipeline, desde un source u origen, a un destino o receptor. <br>
+
+<h6>(Podrías dejar mucho más complejas las pipelines, insertando por ejemplo una consulta en SQL para que te filtre los datos, o usando un procedimiento almacenado entre otros, aquí estoy usando lo más simple)</h6>
 
 ![image](https://github.com/user-attachments/assets/f4bc3efe-9fb9-4410-8aab-f0eaab5a1dd0)
 <br>
@@ -111,9 +95,9 @@ Aquí es importante que tengas bien configurados los accesos a tu pc, con integr
 
 </li> </ul> <h4 align='left'>3. Ejecutar y Verificar:</h4> <ul align='left'>
 
-<li>Ejecuta el <b>Pipeline 1</b> para cargar los datos del archivo Excel a la Base 1.</li>
+<li>Verifica y ejecuta el <b>Pipeline 1</b> para cargar los datos del archivo Excel a la Base 1.</li>
 
-<li>Ejecuta el <b>Pipeline 2</b> para transferir los datos de la Base 1 a la Base 2.</li>
+<li>Verifica y ejecuta el <b>Pipeline 2</b> para transferir los datos de la Base 1 a la Base 2.</li>
 
 <li>Verifica los datos finales en la tabla de la Base 2.</li> </ul>
 
@@ -124,13 +108,11 @@ Aquí es importante que tengas bien configurados los accesos a tu pc, con integr
 [Base SQL 1] --> [Azure Data Factory Pipeline 2] --> [Base SQL 2]
 
 
-<h3 align='left'>Todo armado en el menu de ADF:</h3>
+<h3 align='left'>Al terminar, los recursos creados en tu Data Factory se verán así:</h3>
 
 <b>Captura en ADF</b>
 
 ![{14A8AEDC-649A-40C5-BE3E-65320B0FC56D}](https://github.com/user-attachments/assets/a970e94b-d39c-419e-8b7a-1527a5dbe8da)
 <br>
 
-<h3 align='left'>Licencia:</h3> <p align='left'> Este proyecto está licenciado bajo la <b>MIT License</b>. Puedes usarlo y modificarlo libremente, siempre y cuando menciones al autor. </p>
-
-<h3 align='left'>Autor:</h3> <p align='left'> Creado por: <b>Emiliano Islas</b> </p> <p align='left'> - <a href="https://www.linkedin.com/in/e-islasrivero/">LinkedIn</a> <br> - <a href="https://github.com/Emislas-bit">GitHub</a> </p>
+<p align='left'> <b>Emiliano Islas</b> </p> <p align='left'> - <a href="https://www.linkedin.com/in/e-islasrivero/">LinkedIn</a> <br> - <a href="https://github.com/Emislas-bit">GitHub</a> </p>
